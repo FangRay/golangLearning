@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>购物车</title>
+<link type="text/css" rel="stylesheet" href="/static/css/style.css" >
+</head>
+<script src="/static/script/jquery-1.7.2.js"></script>
+<script>
+	$(function(){
+		$(".whichbook").click(function(){
+			var title = $(this).attr("id")
+			return confirm("you sure want to delete book["+title+"]? think twice");
+
+		});
+
+		$("#whichcart").click(function(){
+			
+			return confirm("you sure want to empty your shopping cart?");
+
+		});
+
+		$(".count").change(function(){
+			var goodid =$(this).attr("id");
+			var userid =$(this).attr("name");
+			var goodcount =$(this).val();
+			var url = "/modifycart"
+			var para={"goodid":goodid,"userid":userid,"goodcount":goodcount}
+			$.post(url,para,function(res){
+				if(res=="right"){
+					location="/showcart"
+				}else if(res=="wrongnumber"){
+					alert("input right number please")
+				}
+			});
+
+
+		});
+
+	});
+	
+			
+
+</script>
+<body>
+	
+	<div id="header">
+			<img class="logo_img" alt="" src="/static/img/logo.gif" >
+			<span class="wel_word">购物车</span>
+			<div>
+				<span>欢迎{{.Username}}光临尚硅谷书城</span>
+				<a href="/">注销</a>&nbsp;&nbsp;
+				<a href="/">返回</a>
+			</div>
+	</div>
+	
+	<div id="main">
+	
+		<table>
+			<tr>
+				<td>商品名称</td>
+				<td>数量</td>
+				<td>单价</td>
+				<td>金额</td>
+				<td>操作</td>
+			</tr>
+			{{range.Cartslice}}		
+			<tr>
+				<td>{{.Goodname}}</td>
+				<td>
+					<input class="count" id="{{.Goodid}}" name="{{.Userid}}" type="text" value="{{.Count}}" style="width: 50px;text-align: center;"/>
+				</td>
+				<td>{{.Goodprice}}</td>
+				<td>{{.GetAmount}}</td>
+				<td><a class="whichbook" id="{{.Goodname}}" href="/deletegood?goodid={{.Goodid}}&userid={{.Userid}}">删除</a></td>
+			</tr>
+			{{end}}	
+			
+			
+		</table>
+		
+		<div class="cart_info">
+			<span class="cart_span">购物车中共有<span class="b_count">{{.Sumpiece}}</span>件商品</span>
+			<span class="cart_span">总金额<span class="b_price">{{.Sumprice}}</span>元</span>
+			<span class="cart_span"><a id="whichcart" href="/deletecart?userid={{.Userid}}">清空购物车</a></span>
+			<span class="cart_span"><a href="/pages/cart/checkout.html">去结账</a></span>
+		</div>
+	
+	</div>
+	
+	<div id="bottom">
+		<span>
+			尚硅谷书城.Copyright &copy;2015
+		</span>
+	</div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>书城首页</title>
+<link type="text/css" rel="stylesheet" href="static/css/style.css" >
+<script src="/static/script/jquery-1.7.2.js"></script>
+
+<script>
+	$(function(){
+	
+		$("#sub").click(function(){
+		var address = $("#pn_input").val();
+		location = "/?pageno="+address
+		});
+
+		$(".cart").click(function(){
+			var bookname =$(this).attr("name");
+			var bookid =$(this).attr("id");
+			var url ="/addcart" ;
+			var bookprice =$(this).next().attr("value")
+			var para ={"bookname":bookname,"bookid":bookid,"bookprice":bookprice};
+			$.post(url,para,function(res){
+				if(res == "Login Please"){
+					location="/pages/user/login.html"
+				}else{
+					$("#bookname").text(res);
+				}				
+			});
+		});
+	});
+
+</script>
+
+</head>
+<body>
+	
+	<div id="header">
+			<img class="logo_img" alt="" src="/static/img/logo.gif" >
+			<span class="wel_word">网上书城</span>
+			{{if .Islogin}}
+			<div>
+				<span>欢迎{{.Username}}光临尚硅谷书城</span>
+				<a href="/showcart">购物车</a>
+				<a href="/logout">注销</a>
+				<a href="/pages/manager/manager.html">后台管理</a>
+				
+			</div>
+			{{else}}
+			<div>
+				<a href="pages/user/login.html">登录</a> | 
+				<a href="pages/user/regist.html">注册</a> 
+				<a href="/main">返回</a>
+			</div>
+			{{end}}
+	</div>
+	
+	
+	<div id="main">
+		<div id="book">
+			<div class="book_cond">
+				价格：<input type="text" name="min"> 元 - <input type="text" name="max"> 元 <button>查询</button>
+			</div>
+			<div style="text-align: center">
+				<span>您的购物车中有{{.Cartpieces}}件商品</span>
+				<div >
+					<span style="color: red" id="bookname"></span>
+				</div>
+			</div>
+
+			{{range .Bookslice}}
+			<div class="b_list">
+				<div class="img_div">
+					<img class="book_img" alt="" src="/static/img/default.jpg" />
+				</div>
+				<div class="book_info">
+					<div class="book_name">
+						<span class="sp1">书名:</span>
+						<span class="sp3" id="booktitle" >{{.Title}}</span>
+					</div>
+					<div class="book_author">
+						<span class="sp1">作者:</span>
+						<span class="sp2">{{.Author}}</span>
+					</div>
+					<div class="book_price">
+						<span class="sp1">价格:</span>
+						<span class="sp2" id="bookprice">{{.Price}}</span>
+					</div>
+					<div class="book_sales">
+						<span class="sp1">销量:</span>
+						<span class="sp2">{{.Sales}}</span>
+					</div>
+					<div class="book_amount">
+						<span class="sp1">库存:</span>
+						<span class="sp2">{{.Stock}}</span>
+					</div>
+					<div class="book_add">
+						<button class="cart" id="{{.Id}}" name="{{.Title}}" >加入购物车</button>
+						<input type="hidden" value="{{.Price}}">
+					</div>
+				</div>
+			</div>
+			{{end}}
+			
+			
+		</div>
+		
+		<div id="page_nav">
+		{{if .FirstPage}}
+		<a href="/?pageno=1">首页</a>
+		<a href="/?pageno={{.LastPage}}">上一页</a>
+		{{end}}
+	
+		【{{.Pageno}}】
+		
+		{{if .EndPage}}
+		<a href="/?pageno={{.NextPage}}">下一页</a>
+		<a href="/?pageno={{.PageTotal}}">末页</a>
+		{{end}}
+
+		共{{.PageTotal}}页，{{ .Pagesum}}条记录 到第<input value="{{.Pageno}}" name="pn" id="pn_input"/>页
+		<input type="button" value="确定" id="sub">
+		</div>
+	
+	</div>
+	
+	<div id="bottom">
+		<span>
+			尚硅谷书城.Copyright &copy;2015
+		</span>
+	</div>
+</body>
+</html>
