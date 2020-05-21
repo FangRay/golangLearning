@@ -14,6 +14,7 @@ func main() {
 		Schedule:  &schedule.Sscheduler{},
 	}
 
+	// 这个是所有work都用一个in的chan
 	/*ce := engine.Intercon{
 		WorkerNum: 10,
 		Schedule:  &schedule.SimpleSchedule{},
