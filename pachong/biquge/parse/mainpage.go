@@ -7,7 +7,7 @@ import (
 )
 
 func ParseMain(bytes []byte) engine.ParseResult {
-	var weylin string = `/([\d]+/)">([^<]+)</a>`
+	var weylin string = `/(.[0-9]+/)">([^<]+)</a>`
 	compile := regexp.MustCompile(weylin)
 
 	//allString := compile.FindAll(result,-1)
@@ -22,18 +22,26 @@ func ParseMain(bytes []byte) engine.ParseResult {
 			Url:       url,
 			ParseFunc: SecondPage,
 		})
-	}
-
-	for _, v := range matches {
-		url := `https://www.biquge.com.cn/book/` + string(v[1])
+		//把书信息提出来的requests
 		bookname := string(v[2])
 		result.Requests = append(result.Requests, engine.Requests{
 			Url: url,
 			ParseFunc: func(bytes []byte) engine.ParseResult {
-				return BookInfo(bytes, bookname) //for里的函数，参数一定要复制一下
+				return BookInfo(bytes, bookname)
 			},
 		})
 	}
+
+	/*	for _, v := range matches {
+		url := `https://www.biquge.com.cn/book/` + string(v[1])
+		bookname := string(v[2])
+		result.Requests = append(result.Requests, engine.Requests{
+			Url: url,   //因为 bookinfo有2参数，但是Parsefun只有1参数，所以建立一个匿名函数，闭包
+			ParseFunc: func(bytes []byte) engine.ParseResult {
+				return BookInfo(bytes, bookname) //for里的函数，参数一定要复制一下
+			},
+		})
+	}*/
 
 	return result
 }
@@ -77,11 +85,27 @@ func SecondPage(bytes []byte) engine.ParseResult {
 			Url:       url,
 			ParseFunc: NilParse,
 		})
+
 		count++
-		/*if count > 30 {
+		if count > 10 {
 			break
-		}*/
+		}
 	}
+	//把页面所有其它书的连接都提取出来 ，重复mainpage的步骤而已
+	var weylin string = `/([a-z0-9]+/)">([^<]+)</a>`
+	compile2 := regexp.MustCompile(weylin)
+
+	//allString := compile.FindAll(result,-1)
+	matches2 := compile2.FindAllSubmatch(bytes, -1)
+	for _, v := range matches2 {
+		url2 := `https://www.biquge.com.cn/book/` + string(v[1])
+		result.Requests = append(result.Requests, engine.Requests{
+			Url:       url2,
+			ParseFunc: SecondPage,
+		})
+		result.Items = append(result.Items, string(v[2]))
+	}
+
 	return result
 
 }
