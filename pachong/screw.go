@@ -2,6 +2,7 @@ package main
 
 //
 import (
+	"pachong/ItemChan"
 	"pachong/biquge/parse"
 	"pachong/engine"
 	"pachong/schedule"
@@ -12,6 +13,7 @@ func main() {
 	ce := engine.Intercon{
 		WorkerNum: 100,
 		Schedule:  &schedule.Sscheduler{},
+		ItemChan:  ItemChan.ItemProcedure(),
 	}
 
 	//Today is a happy day, since i finally can sy my works :)

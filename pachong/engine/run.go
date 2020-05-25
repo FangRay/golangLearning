@@ -42,7 +42,7 @@ func Worker(r Requests) (ParseResult, error) {
 		log.Print(err)
 		return ParseResult{}, err
 	}
-	log.Printf("Work Fetch Url : %v \n", r.Url)
+	//log.Printf("Work Fetch Url : %v \n", r.Url)
 	return r.ParseFunc(bytes), nil
 	//fmt.Printf("Fetch Result\n" ,result.Items)
 	// 加。。。表示全部append進去
