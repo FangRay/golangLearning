@@ -1,6 +1,8 @@
 package schedule
 
-import "pachong/engine"
+import (
+	"pachong/engine"
+)
 
 type Sscheduler struct {
 	RequestChan chan engine.Requests

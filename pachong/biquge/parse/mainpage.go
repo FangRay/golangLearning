@@ -19,8 +19,20 @@ func ParseMain(bytes []byte) engine.ParseResult {
 		//result.Items = append(result.Items, string(v[2]))
 		// 老师这个方法好，直接用append里生产结构体
 		result.Requests = append(result.Requests, engine.Requests{
+			Url: url,
+			//ParseFunc: SecondPage,
+			ParseFunc: NilParse,
+		})
+		//下本书里找到同样的书
+		result.Requests = append(result.Requests, engine.Requests{
 			Url:       url,
-			ParseFunc: SecondPage,
+			ParseFunc: ParseMain,
+		})
+		result.Requests = append(result.Requests, engine.Requests{
+			Url: url,
+			ParseFunc: func(bytes []byte) engine.ParseResult {
+				return BookInfo(bytes, string(v[2]))
+			},
 		})
 
 	}
@@ -54,41 +66,21 @@ func BookInfo(bytes []byte, pname string) engine.ParseResult {
 }
 
 func SecondPage(bytes []byte) engine.ParseResult {
+	//爬取章节和内容，暂时没有使用
 	var reg string = `/book/([\d]+/)([\d]+.html)[^>]+>([^<]+)</a>`
 	compile := regexp.MustCompile(reg)
 	submatch := compile.FindAllSubmatch(bytes, -1)
 	result := engine.ParseResult{}
-	var bookurl string
 
 	for _, v := range submatch {
 		//result.Items = append(result.Items, string(v[3]))
-		/*	url := `https://www.biquge.com.cn/book/` + string(v[1]) + string(v[2])
-			//log.Printf("Second Page ParseLink %s :%s", url, string(v[3]))
-			result.Requests = append(result.Requests, engine.Requests{
-				Url:       url,
-				ParseFunc: NilParse,
-			})*/
-		bookurl = `https://www.biquge.com.cn/book/` + string(v[1])
+		url := `https://www.biquge.com.cn/book/` + string(v[1]) + string(v[2])
+		//log.Printf("Second Page ParseLink %s :%s", url, string(v[3]))
+		result.Requests = append(result.Requests, engine.Requests{
+			Url:       url,
+			ParseFunc: NilParse,
+		})
 	}
-
-	namereg := `book_name" content="(["]+)"/>`
-	compile = regexp.MustCompile(namereg)
-	bookname := getstring(bytes, compile)
-	//把书信息提出来的requests,判断是否重复
-
-	result.Requests = append(result.Requests, engine.Requests{
-		Url: bookurl,
-		ParseFunc: func(bytes []byte) engine.ParseResult {
-			return BookInfo(bytes, bookname)
-		},
-	})
-
-	//把书页里 其它书的连接也提取出来
-	result.Requests = append(result.Requests, engine.Requests{
-		Url:       bookurl,
-		ParseFunc: ParseMain,
-	})
-
 	return result
 
 }

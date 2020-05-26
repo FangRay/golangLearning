@@ -8,13 +8,14 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 	"io/ioutil"
+	"log"
 	"net/http"
 )
 
 func Fetch(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		log.Print(err)
 	}
 	defer resp.Body.Close()
 
