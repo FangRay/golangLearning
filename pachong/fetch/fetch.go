@@ -42,3 +42,5 @@ func determinEncoding(r *bufio.Reader) encoding.Encoding {
 	return e
 
 }
+
+// i have a new computer
